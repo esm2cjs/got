@@ -17,7 +17,7 @@ echo '{ "type": "module" }' > source/package.json
 echo '{ "type": "module" }' > test/package.json
 
 # Replace module imports in all ts files
-files=({source,test}{,/**}/*.ts)
+readarray -d '' files < <(find {source,test} -name "*.ts" -print0)
 function replace_imports () {
 	from=$1
 	to="${2:-@esm2cjs/$from}"

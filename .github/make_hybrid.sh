@@ -31,8 +31,8 @@ replace_imports "form-data-encoder"
 replace_imports "lowercase-keys"
 replace_imports "p-cancelable"
 
-# This test doesn't work
-sed -i "s#test('timeouts are emitted ASAP'#test.failing('timeouts are emitted ASAP'#" test/timeout.ts
+# This test doesn't work locally
+sed -i "s#test('timeouts are emitted ASAP'#test.skip('timeouts are emitted ASAP'#" test/timeout.ts
 
 PJSON=$(cat package.json | jq --tab '
 	del(.type)

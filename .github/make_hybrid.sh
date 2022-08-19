@@ -37,7 +37,7 @@ sed -i "s#test('timeouts are emitted ASAP'#test.skip('timeouts are emitted ASAP'
 PJSON=$(cat package.json | jq --tab '
 	del(.type)
 	| .description = .description + ". This is a fork of " + .repository + ", but with CommonJS support."
-	| .repository = "build/esm2cjs/" + .name
+	| .repository = "esm2cjs/" + .name
 	| .name |= "@esm2cjs/" + .
 	| .author = { "name": "Dominic Griesel", "email": "d.griesel@gmx.net" }
 	| .publishConfig = { "access": "public" }

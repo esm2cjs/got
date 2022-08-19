@@ -11,7 +11,7 @@ import toReadableStream from 'to-readable-stream';
 import getStream from 'get-stream';
 import {pEvent} from 'p-event';
 import FormData from 'form-data';
-import is from '@sindresorhus/is';
+import is from '@esm2cjs/is';
 import delay from 'delay';
 import got, {HTTPError, RequestError} from '../source/index.js';
 import withServer from './helpers/with-server.js';

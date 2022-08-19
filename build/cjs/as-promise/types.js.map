@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../esm/as-promise/types.js"],
+  "sourcesContent": ["import { RequestError } from '../core/errors.js';\n/**\nAn error to be thrown when the request is aborted with `.cancel()`.\n*/\nexport class CancelError extends RequestError {\n    constructor(request) {\n        super('Promise was canceled', {}, request);\n        this.name = 'CancelError';\n        this.code = 'ERR_CANCELED';\n    }\n    /**\n    Whether the promise is canceled.\n    */\n    get isCanceled() {\n        return true;\n    }\n}\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA,oBAA6B;AAItB,MAAM,oBAAoB,2BAAa;AAAA,EAC1C,YAAY,SAAS;AACjB,UAAM,wBAAwB,CAAC,GAAG,OAAO;AACzC,SAAK,OAAO;AACZ,SAAK,OAAO;AAAA,EAChB;AAAA,EAIA,IAAI,aAAa;AACb,WAAO;AAAA,EACX;AACJ;",
+  "names": []
+}

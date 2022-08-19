@@ -4,7 +4,7 @@ import {PassThrough as PassThroughStream} from 'stream';
 import {Socket} from 'net';
 import http from 'http';
 import test from 'ava';
-import is from '@sindresorhus/is';
+import is from '@esm2cjs/is';
 import {Handler} from 'express';
 import getStream from 'get-stream';
 import {pEvent} from 'p-event';

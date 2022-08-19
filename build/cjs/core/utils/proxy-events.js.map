@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../esm/core/utils/proxy-events.js"],
+  "sourcesContent": ["export default function proxyEvents(from, to, events) {\n    const eventFunctions = {};\n    for (const event of events) {\n        const eventFunction = (...args) => {\n            to.emit(event, ...args);\n        };\n        eventFunctions[event] = eventFunction;\n        from.on(event, eventFunction);\n    }\n    return () => {\n        for (const [event, eventFunction] of Object.entries(eventFunctions)) {\n            from.off(event, eventFunction);\n        }\n    };\n}\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAe,SAAR,YAA6B,MAAM,IAAI,QAAQ;AAClD,QAAM,iBAAiB,CAAC;AACxB,aAAW,SAAS,QAAQ;AACxB,UAAM,gBAAgB,IAAI,SAAS;AAC/B,SAAG,KAAK,OAAO,GAAG,IAAI;AAAA,IAC1B;AACA,mBAAe,SAAS;AACxB,SAAK,GAAG,OAAO,aAAa;AAAA,EAChC;AACA,SAAO,MAAM;AACT,eAAW,CAAC,OAAO,aAAa,KAAK,OAAO,QAAQ,cAAc,GAAG;AACjE,WAAK,IAAI,OAAO,aAAa;AAAA,IACjC;AAAA,EACJ;AACJ;",
+  "names": []
+}

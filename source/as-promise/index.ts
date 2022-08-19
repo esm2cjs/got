@@ -1,6 +1,6 @@
 import {EventEmitter} from 'node:events';
-import is from '@sindresorhus/is';
-import PCancelable from 'p-cancelable';
+import is from '@esm2cjs/is';
+import PCancelable from '@esm2cjs/p-cancelable';
 import {
 	RequestError,
 	HTTPError,

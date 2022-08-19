@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../esm/index.js"],
+  "sourcesContent": ["import create from './create.js';\nimport Options from './core/options.js';\nconst defaults = {\n    options: new Options(),\n    handlers: [],\n    mutableDefaults: false,\n};\nconst got = create(defaults);\nexport default got;\nexport { got };\nexport { default as Options } from './core/options.js';\nexport * from './core/options.js';\nexport * from './core/response.js';\nexport * from './core/index.js';\nexport * from './core/errors.js';\nexport { default as calculateRetryDelay } from './core/calculate-retry-delay.js';\nexport * from './as-promise/types.js';\nexport * from './types.js';\nexport { default as create } from './create.js';\nexport { default as parseLinkHeader } from './core/parse-link-header.js';\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA,oBAAmB;AACnB,qBAAoB;AASpB,IAAAA,kBAAmC;AACnC,wBAAc,8BAXd;AAYA,wBAAc,+BAZd;AAaA,wBAAc,4BAbd;AAcA,wBAAc,6BAdd;AAeA,mCAA+C;AAC/C,wBAAc,kCAhBd;AAiBA,wBAAc,uBAjBd;AAkBA,IAAAC,iBAAkC;AAClC,+BAA2C;AAjB3C,MAAM,WAAW;AAAA,EACb,SAAS,IAAI,eAAAC,QAAQ;AAAA,EACrB,UAAU,CAAC;AAAA,EACX,iBAAiB;AACrB;AACA,MAAM,UAAM,cAAAC,SAAO,QAAQ;AAC3B,IAAO,cAAQ;",
+  "names": ["import_options", "import_create", "Options", "create"]
+}

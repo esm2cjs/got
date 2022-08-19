@@ -1,7 +1,7 @@
 import {Buffer} from 'node:buffer';
 import {promisify} from 'node:util';
 import {ClientRequestArgs} from 'node:http';
-import is from '@sindresorhus/is';
+import is from '@esm2cjs/is';
 import isFormData from './is-form-data.js';
 
 export default async function getBodySize(body: unknown, headers: ClientRequestArgs['headers']): Promise<number | undefined> {

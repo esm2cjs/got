@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../esm/core/utils/is-form-data.js"],
+  "sourcesContent": ["import is from '@esm2cjs/is';\nexport default function isFormData(body) {\n    return is.nodeStream(body) && is.function_(body.getBoundary);\n}\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA,gBAAe;AACA,SAAR,WAA4B,MAAM;AACrC,SAAO,UAAAA,QAAG,WAAW,IAAI,KAAK,UAAAA,QAAG,UAAU,KAAK,WAAW;AAC/D;",
+  "names": ["is"]
+}

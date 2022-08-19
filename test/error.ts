@@ -6,7 +6,7 @@ import http from 'http';
 import stream from 'stream';
 import test from 'ava';
 import getStream from 'get-stream';
-import is from '@sindresorhus/is';
+import is from '@esm2cjs/is';
 import got, {RequestError, HTTPError, TimeoutError} from '../source/index.js';
 import Request from '../source/core/index.js';
 import withServer from './helpers/with-server.js';

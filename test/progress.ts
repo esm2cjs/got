@@ -8,7 +8,7 @@ import toReadableStream from 'to-readable-stream';
 import getStream from 'get-stream';
 import FormData from 'form-data';
 import {temporaryFile} from 'tempy';
-import is from '@sindresorhus/is';
+import is from '@esm2cjs/is';
 import test, {ExecutionContext} from 'ava';
 import {Handler} from 'express';
 import {Progress} from '../source/index.js';

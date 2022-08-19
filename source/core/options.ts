@@ -18,15 +18,15 @@ import type {
 	Agent as HttpsAgent,
 } from 'node:https';
 import type {InspectOptions} from 'node:util';
-import is, {assert} from '@sindresorhus/is';
-import lowercaseKeys from 'lowercase-keys';
+import is, {assert} from '@esm2cjs/is';
+import lowercaseKeys from '@esm2cjs/lowercase-keys';
 import CacheableLookup from 'cacheable-lookup';
 import http2wrapper, {ClientHttp2Session} from 'http2-wrapper';
-import {isFormData} from 'form-data-encoder';
-import type {FormDataLike} from 'form-data-encoder';
+import {isFormData} from '@esm2cjs/form-data-encoder';
+import type {FormDataLike} from '@esm2cjs/form-data-encoder';
 import type CacheableRequest from 'cacheable-request';
 import type ResponseLike from 'responselike';
-import type {IncomingMessageWithTimings} from '@szmarczak/http-timer';
+import type {IncomingMessageWithTimings} from '@esm2cjs/http-timer';
 import type {CancelableRequest} from '../as-promise/types.js';
 import parseLinkHeader from './parse-link-header.js';
 import type {PlainResponse, Response} from './response.js';

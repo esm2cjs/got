@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../esm/core/utils/is-client-request.js"],
+  "sourcesContent": ["function isClientRequest(clientRequest) {\n    return clientRequest.writable && !clientRequest.writableEnded;\n}\nexport default isClientRequest;\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA,SAAS,gBAAgB,eAAe;AACpC,SAAO,cAAc,YAAY,CAAC,cAAc;AACpD;AACA,IAAO,4BAAQ;",
+  "names": []
+}

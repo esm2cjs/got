@@ -1,5 +1,5 @@
 import type {Buffer} from 'node:buffer';
-import PCancelable from 'p-cancelable';
+import PCancelable from '@esm2cjs/p-cancelable';
 import {RequestError} from '../core/errors.js';
 import type Request from '../core/index.js';
 import type {RequestEvents} from '../core/index.js';

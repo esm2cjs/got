@@ -730,7 +730,7 @@ test.serial('cancelling the request removes timeouts', withServer, async (t, ser
 	await delay(1000);
 });
 
-test('timeouts are emitted ASAP', async t => {
+test.skip('timeouts are emitted ASAP', async t => {
 	const timeout = 500;
 	const marginOfError = process.env.CI ? 200 : 100;
 

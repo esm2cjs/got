@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../esm/core/utils/url-to-options.js"],
+  "sourcesContent": ["import is from '@esm2cjs/is';\nexport default function urlToOptions(url) {\n    // Cast to URL\n    url = url;\n    const options = {\n        protocol: url.protocol,\n        hostname: is.string(url.hostname) && url.hostname.startsWith('[') ? url.hostname.slice(1, -1) : url.hostname,\n        host: url.host,\n        hash: url.hash,\n        search: url.search,\n        pathname: url.pathname,\n        href: url.href,\n        path: `${url.pathname || ''}${url.search || ''}`,\n    };\n    if (is.string(url.port) && url.port.length > 0) {\n        options.port = Number(url.port);\n    }\n    if (url.username || url.password) {\n        options.auth = `${url.username || ''}:${url.password || ''}`;\n    }\n    return options;\n}\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA,gBAAe;AACA,SAAR,aAA8B,KAAK;AAEtC,QAAM;AACN,QAAM,UAAU;AAAA,IACZ,UAAU,IAAI;AAAA,IACd,UAAU,UAAAA,QAAG,OAAO,IAAI,QAAQ,KAAK,IAAI,SAAS,WAAW,GAAG,IAAI,IAAI,SAAS,MAAM,GAAG,EAAE,IAAI,IAAI;AAAA,IACpG,MAAM,IAAI;AAAA,IACV,MAAM,IAAI;AAAA,IACV,QAAQ,IAAI;AAAA,IACZ,UAAU,IAAI;AAAA,IACd,MAAM,IAAI;AAAA,IACV,MAAM,GAAG,IAAI,YAAY,KAAK,IAAI,UAAU;AAAA,EAChD;AACA,MAAI,UAAAA,QAAG,OAAO,IAAI,IAAI,KAAK,IAAI,KAAK,SAAS,GAAG;AAC5C,YAAQ,OAAO,OAAO,IAAI,IAAI;AAAA,EAClC;AACA,MAAI,IAAI,YAAY,IAAI,UAAU;AAC9B,YAAQ,OAAO,GAAG,IAAI,YAAY,MAAM,IAAI,YAAY;AAAA,EAC5D;AACA,SAAO;AACX;",
+  "names": ["is"]
+}

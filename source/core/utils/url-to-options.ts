@@ -1,5 +1,5 @@
 import {URL, UrlWithStringQuery} from 'node:url';
-import is from '@sindresorhus/is';
+import is from '@esm2cjs/is';
 
 // TODO: Deprecate legacy URL at some point
 

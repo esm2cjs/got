@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../esm/core/utils/unhandle.js"],
+  "sourcesContent": ["// When attaching listeners, it's very easy to forget about them.\n// Especially if you do error handling and set timeouts.\n// So instead of checking if it's proper to throw an error on every timeout ever,\n// use this simple tool which will remove all listeners you have attached.\nexport default function unhandle() {\n    const handlers = [];\n    return {\n        once(origin, event, fn) {\n            origin.once(event, fn);\n            handlers.push({ origin, event, fn });\n        },\n        unhandleAll() {\n            for (const handler of handlers) {\n                const { origin, event, fn } = handler;\n                origin.removeListener(event, fn);\n            }\n            handlers.length = 0;\n        },\n    };\n}\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAIe,SAAR,WAA4B;AAC/B,QAAM,WAAW,CAAC;AAClB,SAAO;AAAA,IACH,KAAK,QAAQ,OAAO,IAAI;AACpB,aAAO,KAAK,OAAO,EAAE;AACrB,eAAS,KAAK,EAAE,QAAQ,OAAO,GAAG,CAAC;AAAA,IACvC;AAAA,IACA,cAAc;AACV,iBAAW,WAAW,UAAU;AAC5B,cAAM,EAAE,QAAQ,OAAO,GAAG,IAAI;AAC9B,eAAO,eAAe,OAAO,EAAE;AAAA,MACnC;AACA,eAAS,SAAS;AAAA,IACtB;AAAA,EACJ;AACJ;",
+  "names": []
+}

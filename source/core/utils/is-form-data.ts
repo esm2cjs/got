@@ -1,5 +1,5 @@
 import {Readable} from 'node:stream';
-import is from '@sindresorhus/is';
+import is from '@esm2cjs/is';
 
 interface FormData extends Readable {
 	getBoundary: () => string;

@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../esm/core/utils/get-body-size.js"],
+  "sourcesContent": ["import { Buffer } from 'node:buffer';\nimport { promisify } from 'node:util';\nimport is from '@esm2cjs/is';\nimport isFormData from './is-form-data.js';\nexport default async function getBodySize(body, headers) {\n    if (headers && 'content-length' in headers) {\n        return Number(headers['content-length']);\n    }\n    if (!body) {\n        return 0;\n    }\n    if (is.string(body)) {\n        return Buffer.byteLength(body);\n    }\n    if (is.buffer(body)) {\n        return body.length;\n    }\n    if (isFormData(body)) {\n        return promisify(body.getLength.bind(body))();\n    }\n    return undefined;\n}\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA,yBAAuB;AACvB,uBAA0B;AAC1B,gBAAe;AACf,0BAAuB;AACvB,eAAO,YAAmC,MAAM,SAAS;AACrD,MAAI,WAAW,oBAAoB,SAAS;AACxC,WAAO,OAAO,QAAQ,iBAAiB;AAAA,EAC3C;AACA,MAAI,CAAC,MAAM;AACP,WAAO;AAAA,EACX;AACA,MAAI,UAAAA,QAAG,OAAO,IAAI,GAAG;AACjB,WAAO,0BAAO,WAAW,IAAI;AAAA,EACjC;AACA,MAAI,UAAAA,QAAG,OAAO,IAAI,GAAG;AACjB,WAAO,KAAK;AAAA,EAChB;AACA,UAAI,oBAAAC,SAAW,IAAI,GAAG;AAClB,eAAO,4BAAU,KAAK,UAAU,KAAK,IAAI,CAAC,EAAE;AAAA,EAChD;AACA,SAAO;AACX;",
+  "names": ["is", "isFormData"]
+}

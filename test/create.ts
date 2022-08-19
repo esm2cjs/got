@@ -1,7 +1,7 @@
 import {Agent as HttpAgent, IncomingMessage, request as httpRequest, RequestOptions} from 'http';
 import {URL} from 'url';
 import test from 'ava';
-import is from '@sindresorhus/is';
+import is from '@esm2cjs/is';
 import {Handler} from 'express';
 import delay from 'delay';
 import got, {

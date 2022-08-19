@@ -1,7 +1,7 @@
 import http from 'http';
 import {promisify} from 'util';
 import {ExecutionContext, Macro} from 'ava'; // eslint-disable-line ava/use-test
-import is from '@sindresorhus/is';
+import is from '@esm2cjs/is';
 import {temporaryFile} from 'tempy';
 import FakeTimers from '@sinonjs/fake-timers';
 import got, {Got, ExtendOptions} from '../../source/index.js';

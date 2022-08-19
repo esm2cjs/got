@@ -5,7 +5,7 @@ import path from 'path';
 import test from 'ava';
 import {Handler} from 'express';
 import FormData from 'form-data';
-import {FormDataEncoder} from 'form-data-encoder';
+import {FormDataEncoder} from '@esm2cjs/form-data-encoder';
 import {FormData as FormDataNode} from 'formdata-node';
 import got, {Headers} from '../source/index.js';
 import withServer from './helpers/with-server.js';

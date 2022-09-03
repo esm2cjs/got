@@ -1,3 +1,3 @@
 /// <reference types="node" />
-import { URL } from 'url';
+import type { URL } from 'url';
 export default function isUnixSocketURL(url: URL): boolean;

@@ -501,7 +501,9 @@ class Request extends import_node_stream.Duplex {
           if (noContentType) {
             headers["content-type"] = encoder.headers["Content-Type"];
           }
-          headers["content-length"] = encoder.headers["Content-Length"];
+          if ("Content-Length" in encoder.headers) {
+            headers["content-length"] = encoder.headers["Content-Length"];
+          }
           options.body = encoder.encode();
         }
         if ((0, import_is_form_data.default)(options.body) && noContentType) {
@@ -906,8 +908,11 @@ class Request extends import_node_stream.Duplex {
   }
   async _error(error) {
     try {
-      for (const hook of this.options.hooks.beforeError) {
-        error = await hook(error);
+      if (error instanceof import_errors.HTTPError && !this.options.throwHttpErrors) {
+      } else {
+        for (const hook of this.options.hooks.beforeError) {
+          error = await hook(error);
+        }
       }
     } catch (error_) {
       error = new import_errors.RequestError(error_.message, error_, this);
@@ -919,7 +924,7 @@ class Request extends import_node_stream.Duplex {
       return;
     }
     this._request.write(chunk, encoding, (error) => {
-      if (!error) {
+      if (!error && !this._request.destroyed) {
         this._uploadedSize += import_node_buffer.Buffer.byteLength(chunk, encoding);
         const progress = this.uploadProgress;
         if (progress.percent < 1) {

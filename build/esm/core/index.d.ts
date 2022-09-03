@@ -12,17 +12,15 @@ import type { Socket } from 'node:net';
 import CacheableRequest from 'cacheable-request';
 import type { Timings } from '@esm2cjs/http-timer';
 import type ResponseLike from 'responselike';
-import Options from './options.js';
-import { Response } from './response.js';
+import Options, { type NativeRequestOptions } from './options.js';
+import { type PlainResponse, type Response } from './response.js';
 import { RequestError } from './errors.js';
-import type { PlainResponse } from './response.js';
-import type { NativeRequestOptions } from './options.js';
 declare type Error = NodeJS.ErrnoException;
-export interface Progress {
+export declare type Progress = {
     percent: number;
     transferred: number;
     total?: number;
-}
+};
 export declare type GotEventFunction<T> = 
 /**
 `request` event to get the request object of the request.
@@ -84,11 +82,11 @@ When this event is emitted, you should reset the stream you were writing to and 
 See `got.options.retry` for more information.
 */
  & ((name: 'retry', listener: (retryCount: number, error: RequestError) => void) => T);
-export interface RequestEvents<T> {
+export declare type RequestEvents<T> = {
     on: GotEventFunction<T>;
     once: GotEventFunction<T>;
     off: GotEventFunction<T>;
-}
+};
 export declare type CacheableRequestFunction = (options: string | URL | NativeRequestOptions, cb?: (response: ServerResponse | ResponseLike) => void) => CacheableRequest.Emitter;
 declare type UrlType = ConstructorParameters<typeof Options>[0];
 declare type OptionsType = ConstructorParameters<typeof Options>[1];

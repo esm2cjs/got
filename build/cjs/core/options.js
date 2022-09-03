@@ -725,8 +725,7 @@ class Options {
         throw new Error(`Unexpected hook event: ${knownHookEvent}`);
       }
       const typedKnownHookEvent = knownHookEvent;
-      const typedValue = value;
-      const hooks = typedValue[typedKnownHookEvent];
+      const hooks = value[typedKnownHookEvent];
       import_is.assert.any([import_is.default.array, import_is.default.undefined], hooks);
       if (hooks) {
         for (const hook of hooks) {
@@ -1151,7 +1150,6 @@ class Options {
     Object.freeze(options.retry.errorCodes);
     Object.freeze(options.retry.methods);
     Object.freeze(options.retry.statusCodes);
-    Object.freeze(options.context);
   }
 }
 // Annotate the CommonJS export names for ESM import in node:

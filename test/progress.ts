@@ -1,3 +1,4 @@
+import process from 'process';
 import {Buffer} from 'buffer';
 import {promisify} from 'util';
 import stream from 'stream';
@@ -9,9 +10,10 @@ import getStream from 'get-stream';
 import FormData from 'form-data';
 import {temporaryFile} from 'tempy';
 import is from '@esm2cjs/is';
-import test, {ExecutionContext} from 'ava';
-import {Handler} from 'express';
-import {Progress} from '../source/index.js';
+import test, {type ExecutionContext} from 'ava';
+import type {Handler} from 'express';
+import {pEvent} from 'p-event';
+import type {Progress} from '../source/index.js';
 import withServer from './helpers/with-server.js';
 
 const checkEvents = (t: ExecutionContext, events: Progress[], bodySize?: number) => {
@@ -261,4 +263,32 @@ test('upload progress - one event when removed listener', withServer, async (t, 
 			total: undefined,
 		},
 	]);
+});
+
+test('does not emit uploadProgress after cancelation', withServer, async (t, server, got) => {
+	server.post('/', () => {});
+
+	const stream = got.stream.post();
+
+	stream.once('uploadProgress', () => { // 0%
+		stream.once('uploadProgress', () => { // 'foo'
+			stream.write('bar');
+
+			process.nextTick(() => {
+				process.nextTick(() => {
+					stream.on('uploadProgress', () => {
+						t.fail('Emitted uploadProgress after cancelation');
+					});
+
+					stream.destroy();
+				});
+			});
+		});
+	});
+
+	stream.write('foo');
+
+	await pEvent(stream, 'close');
+
+	t.pass();
 });

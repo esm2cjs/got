@@ -7,7 +7,7 @@
 /// <reference types="node" />
 /// <reference types="node" />
 /// <reference types="node" />
-import { Buffer } from 'node:buffer';
+import type { Buffer } from 'node:buffer';
 import { URL, URLSearchParams } from 'node:url';
 import { checkServerIdentity } from 'node:tls';
 import http from 'node:http';
@@ -18,7 +18,7 @@ import type { SecureContextOptions, DetailedPeerCertificate } from 'node:tls';
 import type { Agent as HttpAgent, ClientRequest } from 'node:http';
 import type { RequestOptions as HttpsRequestOptions, Agent as HttpsAgent } from 'node:https';
 import CacheableLookup from 'cacheable-lookup';
-import http2wrapper, { ClientHttp2Session } from 'http2-wrapper';
+import http2wrapper, { type ClientHttp2Session } from 'http2-wrapper';
 import type { FormDataLike } from '@esm2cjs/form-data-encoder';
 import type CacheableRequest from 'cacheable-request';
 import type ResponseLike from 'responselike';
@@ -36,20 +36,20 @@ export declare type NativeRequestOptions = HttpsRequestOptions & CacheOptions & 
 declare type AcceptableResponse = IncomingMessageWithTimings | ResponseLike;
 declare type AcceptableRequestResult = Promisable<AcceptableResponse | ClientRequest> | undefined;
 export declare type RequestFunction = (url: URL, options: NativeRequestOptions, callback?: (response: AcceptableResponse) => void) => AcceptableRequestResult;
-export interface Agents {
+export declare type Agents = {
     http?: HttpAgent | false;
     https?: HttpsAgent | false;
     http2?: unknown | false;
-}
+};
 export declare type Headers = Record<string, string | string[] | undefined>;
-export interface ToughCookieJar {
+export declare type ToughCookieJar = {
     getCookieString: ((currentUrl: string, options: Record<string, unknown>, cb: (error: Error | null, cookies: string) => void) => void) & ((url: string, callback: (error: Error | null, cookieHeader: string) => void) => void);
     setCookie: ((cookieOrString: unknown, currentUrl: string, options: Record<string, unknown>, cb: (error: Error | null, cookie: unknown) => void) => void) & ((rawCookie: string, url: string, callback: (error: Error | null, result: unknown) => void) => void);
-}
-export interface PromiseCookieJar {
+};
+export declare type PromiseCookieJar = {
     getCookieString: (url: string) => Promise<string>;
     setCookie: (rawCookie: string, url: string) => Promise<unknown>;
-}
+};
 export declare type InitHook = (init: OptionsInit, self: Options) => void;
 export declare type BeforeRequestHook = (options: Options) => Promisable<void | Response | ResponseLike>;
 export declare type BeforeRedirectHook = (updatedOptions: Options, plainResponse: PlainResponse) => Promisable<void>;
@@ -59,7 +59,7 @@ export declare type AfterResponseHook<ResponseType = unknown> = (response: Respo
 /**
 All available hooks of Got.
 */
-export interface Hooks {
+export declare type Hooks = {
     /**
     Called with the plain request options, right before their normalization.
 
@@ -327,20 +327,20 @@ export interface Hooks {
     ```
     */
     afterResponse: AfterResponseHook[];
-}
+};
 export declare type ParseJsonFunction = (text: string) => unknown;
 export declare type StringifyJsonFunction = (object: unknown) => string;
 /**
 All available HTTP request methods provided by Got.
 */
 export declare type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'HEAD' | 'DELETE' | 'OPTIONS' | 'TRACE' | 'get' | 'post' | 'put' | 'patch' | 'head' | 'delete' | 'options' | 'trace';
-export interface RetryObject {
+export declare type RetryObject = {
     attemptCount: number;
     retryOptions: RetryOptions;
     error: RequestError;
     computedValue: number;
     retryAfter?: number;
-}
+};
 export declare type RetryFunction = (retryObject: RetryObject) => Promisable<number>;
 /**
 An object representing `limit`, `calculateDelay`, `methods`, `statusCodes`, `maxRetryAfter` and `errorCodes` fields for maximum retry count, retry handler, allowed methods, allowed status codes, maximum [`Retry-After`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After) time and allowed error codes.
@@ -364,7 +364,7 @@ __Note:__ Got does not retry on `POST` by default.
 __Note:__ If `maxRetryAfter` is set to `undefined`, it will use `options.timeout`.
 __Note:__ If [`Retry-After`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After) header is greater than `maxRetryAfter`, it will cancel the request.
 */
-export interface RetryOptions {
+export declare type RetryOptions = {
     limit: number;
     methods: Method[];
     statusCodes: number[];
@@ -373,21 +373,21 @@ export interface RetryOptions {
     backoffLimit: number;
     noise: number;
     maxRetryAfter?: number;
-}
+};
 export declare type CreateConnectionFunction = (options: NativeRequestOptions, oncreate: (error: NodeJS.ErrnoException, socket: Socket) => void) => Socket;
 export declare type CheckServerIdentityFunction = (hostname: string, certificate: DetailedPeerCertificate) => NodeJS.ErrnoException | void;
-export interface CacheOptions {
+export declare type CacheOptions = {
     shared?: boolean;
     cacheHeuristic?: number;
     immutableMinTimeToLive?: number;
     ignoreCargoCult?: boolean;
-}
+};
 declare type PfxObject = {
     buffer: string | Buffer;
     passphrase?: string | undefined;
 };
 declare type PfxType = string | Buffer | Array<string | Buffer | PfxObject> | undefined;
-export interface HttpsOptions {
+export declare type HttpsOptions = {
     alpnProtocols?: string[];
     rejectUnauthorized?: NativeRequestOptions['rejectUnauthorized'];
     checkServerIdentity?: CheckServerIdentityFunction;
@@ -438,21 +438,21 @@ export interface HttpsOptions {
     dhparam?: SecureContextOptions['dhparam'];
     ecdhCurve?: SecureContextOptions['ecdhCurve'];
     certificateRevocationLists?: SecureContextOptions['crl'];
-}
-export interface PaginateData<BodyType, ElementType> {
+};
+export declare type PaginateData<BodyType, ElementType> = {
     response: Response<BodyType>;
     currentItems: ElementType[];
     allItems: ElementType[];
-}
-export interface FilterData<ElementType> {
+};
+export declare type FilterData<ElementType> = {
     item: ElementType;
     currentItems: ElementType[];
     allItems: ElementType[];
-}
+};
 /**
 All options accepted by `got.paginate()`.
 */
-export interface PaginationOptions<ElementType, BodyType> {
+export declare type PaginationOptions<ElementType, BodyType> = {
     /**
     A function that transform [`Response`](#response) into an array of items.
     This is where you should do the parsing.
@@ -550,7 +550,7 @@ export interface PaginationOptions<ElementType, BodyType> {
     @default false
     */
     stackAllItems?: boolean;
-}
+};
 export declare type SearchParameters = Record<string, string | number | boolean | null | undefined>;
 /**
 All parsing methods supported by Got.

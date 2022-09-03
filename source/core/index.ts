@@ -1,6 +1,6 @@
 import process from 'node:process';
 import {Buffer} from 'node:buffer';
-import {Duplex, Readable} from 'node:stream';
+import {Duplex, type Readable} from 'node:stream';
 import {URL, URLSearchParams} from 'node:url';
 import http, {ServerResponse} from 'node:http';
 import type {ClientRequest, RequestOptions} from 'node:http';
@@ -20,8 +20,14 @@ import timedOut, {TimeoutError as TimedOutTimeoutError} from './timed-out.js';
 import urlToOptions from './utils/url-to-options.js';
 import WeakableMap from './utils/weakable-map.js';
 import calculateRetryDelay from './calculate-retry-delay.js';
-import Options, {OptionsError, OptionsInit} from './options.js';
-import {isResponseOk, Response} from './response.js';
+import Options, {
+	type PromiseCookieJar,
+	type NativeRequestOptions,
+	type RetryOptions,
+	type OptionsError,
+	type OptionsInit,
+} from './options.js';
+import {isResponseOk, type PlainResponse, type Response} from './response.js';
 import isClientRequest from './utils/is-client-request.js';
 import isUnixSocketURL from './utils/is-unix-socket-url.js';
 import {
@@ -34,16 +40,14 @@ import {
 	CacheError,
 	AbortError,
 } from './errors.js';
-import type {PlainResponse} from './response.js';
-import type {PromiseCookieJar, NativeRequestOptions, RetryOptions} from './options.js';
 
 type Error = NodeJS.ErrnoException;
 
-export interface Progress {
+export type Progress = {
 	percent: number;
 	transferred: number;
 	total?: number;
-}
+};
 
 const supportsBrotli = is.string(process.versions.brotli);
 
@@ -114,11 +118,11 @@ export type GotEventFunction<T> =
 	*/
 	& ((name: 'retry', listener: (retryCount: number, error: RequestError) => void) => T);
 
-export interface RequestEvents<T> {
+export type RequestEvents<T> = {
 	on: GotEventFunction<T>;
 	once: GotEventFunction<T>;
 	off: GotEventFunction<T>;
-}
+};
 
 export type CacheableRequestFunction = (
 	options: string | URL | NativeRequestOptions,
@@ -479,6 +483,7 @@ export default class Request extends Duplex implements RequestEvents<Request> {
 					return;
 				}
 
+				// The `!destroyed` check is required to prevent `uploadProgress` being emitted after the stream was destroyed
 				if (!error) {
 					this._bodySize = this._uploadedSize;
 
@@ -570,7 +575,9 @@ export default class Request extends Duplex implements RequestEvents<Request> {
 						headers['content-type'] = encoder.headers['Content-Type'];
 					}
 
-					headers['content-length'] = encoder.headers['Content-Length'];
+					if ('Content-Length' in encoder.headers) {
+						headers['content-length'] = encoder.headers['Content-Length'];
+					}
 
 					options.body = encoder.encode();
 				}
@@ -793,6 +800,10 @@ export default class Request extends Duplex implements RequestEvents<Request> {
 			return;
 		}
 
+		// `HTTPError`s always have `error.response.body` defined.
+		// Therefore we cannot retry if `options.throwHttpErrors` is false.
+		// On the last retry, if `options.throwHttpErrors` is false, we would need to return the body,
+		// but that wouldn't be possible since the body would be already read in `error.response.body`.
 		if (options.isStream && options.throwHttpErrors && !isResponseOk(typedResponse)) {
 			this._beforeError(new HTTPError(typedResponse));
 			return;
@@ -1144,9 +1155,15 @@ export default class Request extends Duplex implements RequestEvents<Request> {
 
 	private async _error(error: RequestError): Promise<void> {
 		try {
-			for (const hook of this.options.hooks.beforeError) {
-				// eslint-disable-next-line no-await-in-loop
-				error = await hook(error);
+			if (error instanceof HTTPError && !this.options.throwHttpErrors) {
+				// This branch can be reached only when using the Promise API
+				// Skip calling the hooks on purpose.
+				// See https://github.com/sindresorhus/got/issues/2103
+			} else {
+				for (const hook of this.options.hooks.beforeError) {
+					// eslint-disable-next-line no-await-in-loop
+					error = await hook(error);
+				}
 			}
 		} catch (error_: any) {
 			error = new RequestError(error_.message, error_, this);
@@ -1162,7 +1179,8 @@ export default class Request extends Duplex implements RequestEvents<Request> {
 		}
 
 		this._request.write(chunk, encoding!, (error?: Error | null) => { // eslint-disable-line @typescript-eslint/ban-types
-			if (!error) {
+			// The `!destroyed` check is required to prevent `uploadProgress` being emitted after the stream was destroyed
+			if (!error && !this._request!.destroyed) {
 				this._uploadedSize += Buffer.byteLength(chunk, encoding);
 
 				const progress = this.uploadProgress;

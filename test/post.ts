@@ -8,8 +8,8 @@ import path from 'path';
 import test from 'ava';
 import delay from 'delay';
 import {pEvent} from 'p-event';
-import {Handler} from 'express';
-import {parse, Body, BodyEntryPath, BodyEntryRawValue, isBodyFile} from 'then-busboy';
+import type {Handler} from 'express';
+import {parse, Body, isBodyFile, type BodyEntryPath, type BodyEntryRawValue} from 'then-busboy';
 import {FormData as FormDataNode, Blob, File} from 'formdata-node';
 import {fileFromPath} from 'formdata-node/file-from-path'; // eslint-disable-line n/file-extension-in-import
 import getStream from 'get-stream';
@@ -358,6 +358,36 @@ test('body - sends files with spec-compliant FormData', withServer, async (t, se
 	form.set('file', new File([fileContent], 'file.txt', {type: 'text/plain'}));
 	form.set('anotherFile', await fileFromPath(fullPath, {type: 'text/plain'}));
 	const body = await got.post({body: form}).json<typeof expected>();
+	t.deepEqual(body, expected);
+});
+
+test('body - sends form-data with without known length', withServer, async (t, server, got) => {
+	server.post('/', echoMultipartBody);
+	const fullPath = path.resolve('test/fixtures/ok');
+
+	function getFileStream() {
+		const fileStream = fs.createReadStream(fullPath);
+		const passThrough = new stream.PassThrough();
+		fileStream.pipe(passThrough);
+		return passThrough;
+	}
+
+	const expected = {
+		file: await fsPromises.readFile(fullPath, 'utf8'),
+	};
+
+	const form = new FormDataNode();
+	form.set('file', {
+		[Symbol.toStringTag]: 'File',
+		type: 'text/plain',
+		name: 'file.txt',
+		stream() {
+			return getFileStream();
+		},
+	});
+
+	const body = await got.post({body: form}).json<typeof expected>();
+
 	t.deepEqual(body, expected);
 });
 

@@ -1,8 +1,8 @@
 import {parse, URL, URLSearchParams} from 'url';
 import test from 'ava';
-import {Handler} from 'express';
+import type {Handler} from 'express';
 import {pEvent} from 'p-event';
-import got, {Options, RequestError, StrictOptions} from '../source/index.js';
+import got, {Options, RequestError, type StrictOptions} from '../source/index.js';
 import withServer, {withBodyParsingServer} from './helpers/with-server.js';
 import invalidUrl from './helpers/invalid-url.js';
 
@@ -326,6 +326,18 @@ test.failing('`context` option is enumerable', withServer, async (t, server, got
 			],
 		},
 	});
+});
+
+test('`context` option is never frozen', t => {
+	const client = got.extend({
+		context: {
+			token: 'foobar',
+		},
+	});
+
+	client.defaults.options.context.token = '1234';
+
+	t.is(client.defaults.options.context.token, '1234');
 });
 
 test('`context` option is accessible when using hooks', withServer, async (t, server) => {

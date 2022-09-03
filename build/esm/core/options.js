@@ -464,6 +464,7 @@ export default class Options {
             if (!(key in this._internals.agent)) {
                 throw new TypeError(`Unexpected agent option: ${key}`);
             }
+            // @ts-expect-error - No idea why `value[key]` doesn't work here.
             assert.any([is.object, is.undefined], value[key]);
         }
         if (this._merging) {
@@ -523,6 +524,7 @@ export default class Options {
             if (!(key in this._internals.timeout)) {
                 throw new Error(`Unexpected timeout option: ${key}`);
             }
+            // @ts-expect-error - No idea why `value[key]` doesn't work here.
             assert.any([is.number, is.undefined], value[key]);
         }
         if (this._merging) {
@@ -976,8 +978,7 @@ export default class Options {
                 throw new Error(`Unexpected hook event: ${knownHookEvent}`);
             }
             const typedKnownHookEvent = knownHookEvent;
-            const typedValue = value;
-            const hooks = typedValue[typedKnownHookEvent];
+            const hooks = value[typedKnownHookEvent];
             assert.any([is.array, is.undefined], hooks);
             if (hooks) {
                 for (const hook of hooks) {
@@ -1646,6 +1647,5 @@ export default class Options {
         Object.freeze(options.retry.errorCodes);
         Object.freeze(options.retry.methods);
         Object.freeze(options.retry.statusCodes);
-        Object.freeze(options.context);
     }
 }

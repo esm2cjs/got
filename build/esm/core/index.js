@@ -431,6 +431,7 @@ export default class Request extends Duplex {
                 if (this._request._writableState?.errored) {
                     return;
                 }
+                // The `!destroyed` check is required to prevent `uploadProgress` being emitted after the stream was destroyed
                 if (!error) {
                     this._bodySize = this._uploadedSize;
                     this.emit('uploadProgress', this.uploadProgress);
@@ -501,7 +502,9 @@ export default class Request extends Duplex {
                     if (noContentType) {
                         headers['content-type'] = encoder.headers['Content-Type'];
                     }
-                    headers['content-length'] = encoder.headers['Content-Length'];
+                    if ('Content-Length' in encoder.headers) {
+                        headers['content-length'] = encoder.headers['Content-Length'];
+                    }
                     options.body = encoder.encode();
                 }
                 // Special case for https://github.com/form-data/form-data
@@ -680,6 +683,10 @@ export default class Request extends Duplex {
             }
             return;
         }
+        // `HTTPError`s always have `error.response.body` defined.
+        // Therefore we cannot retry if `options.throwHttpErrors` is false.
+        // On the last retry, if `options.throwHttpErrors` is false, we would need to return the body,
+        // but that wouldn't be possible since the body would be already read in `error.response.body`.
         if (options.isStream && options.throwHttpErrors && !isResponseOk(typedResponse)) {
             this._beforeError(new HTTPError(typedResponse));
             return;
@@ -969,9 +976,16 @@ export default class Request extends Duplex {
     }
     async _error(error) {
         try {
-            for (const hook of this.options.hooks.beforeError) {
-                // eslint-disable-next-line no-await-in-loop
-                error = await hook(error);
+            if (error instanceof HTTPError && !this.options.throwHttpErrors) {
+                // This branch can be reached only when using the Promise API
+                // Skip calling the hooks on purpose.
+                // See https://github.com/sindresorhus/got/issues/2103
+            }
+            else {
+                for (const hook of this.options.hooks.beforeError) {
+                    // eslint-disable-next-line no-await-in-loop
+                    error = await hook(error);
+                }
             }
         }
         catch (error_) {
@@ -985,7 +999,8 @@ export default class Request extends Duplex {
             return;
         }
         this._request.write(chunk, encoding, (error) => {
-            if (!error) {
+            // The `!destroyed` check is required to prevent `uploadProgress` being emitted after the stream was destroyed
+            if (!error && !this._request.destroyed) {
                 this._uploadedSize += Buffer.byteLength(chunk, encoding);
                 const progress = this.uploadProgress;
                 if (progress.percent < 1) {

@@ -134,8 +134,8 @@ test('throws on endless redirects - default behavior', withServer, async (t, ser
 
 	const error = await t.throwsAsync<MaxRedirectsError>(got(''), {message: 'Redirected 10 times. Aborting.'});
 
-	t.deepEqual(error.response.redirectUrls.map(String), Array.from({length: 10}).fill(`${server.url}/`));
-	t.is(error.code, 'ERR_TOO_MANY_REDIRECTS');
+	t.deepEqual(error?.response.redirectUrls.map(String), Array.from({length: 10}).fill(`${server.url}/`));
+	t.is(error?.code, 'ERR_TOO_MANY_REDIRECTS');
 });
 
 test('custom `maxRedirects` option', withServer, async (t, server, got) => {
@@ -148,8 +148,8 @@ test('custom `maxRedirects` option', withServer, async (t, server, got) => {
 
 	const error = await t.throwsAsync<MaxRedirectsError>(got('', {maxRedirects: 5}), {message: 'Redirected 5 times. Aborting.'});
 
-	t.deepEqual(error.response.redirectUrls.map(String), Array.from({length: 5}).fill(`${server.url}/`));
-	t.is(error.code, 'ERR_TOO_MANY_REDIRECTS');
+	t.deepEqual(error?.response.redirectUrls.map(String), Array.from({length: 5}).fill(`${server.url}/`));
+	t.is(error?.code, 'ERR_TOO_MANY_REDIRECTS');
 });
 
 test('searchParams are not breaking redirects', withServer, async (t, server, got) => {
@@ -242,7 +242,7 @@ test('redirects on 303 response even on post, put, delete', withServer, async (t
 });
 
 test('redirects from http to https work', withServer, async (t, serverHttp) => {
-	await withHttpsServer()(t, async (t, serverHttps, got) => {
+	await withHttpsServer().exec(t, async (t, serverHttps, got) => {
 		serverHttp.get('/', (_request, response) => {
 			response.end('http');
 		});
@@ -265,7 +265,7 @@ test('redirects from http to https work', withServer, async (t, serverHttp) => {
 });
 
 test('redirects from https to http work', withHttpsServer(), async (t, serverHttps, got) => {
-	await withServer(t, async (t, serverHttp) => {
+	await withServer.exec(t, async (t, serverHttp) => {
 		serverHttp.get('/', (_request, response) => {
 			response.end('http');
 		});
@@ -459,9 +459,18 @@ test('method rewriting', withServer, async (t, server, got) => {
 		});
 		response.end();
 	});
-
 	server.get('/', (_request, response) => {
 		response.end();
+	});
+
+	server.post('/temporaryRedirect', (_request, response) => {
+		response.writeHead(307, {
+			location: '/',
+		});
+		response.end();
+	});
+	server.post('/', (request, response) => {
+		request.pipe(response);
 	});
 
 	const {body} = await got.post('redirect', {
@@ -477,6 +486,21 @@ test('method rewriting', withServer, async (t, server, got) => {
 	});
 
 	t.is(body, '');
+
+	// Do not rewrite method on 307 or 308
+	const {body: temporaryRedirectBody} = await got.post('temporaryRedirect', {
+		body: 'foobar',
+		methodRewriting: true,
+		hooks: {
+			beforeRedirect: [
+				options => {
+					t.is(options.body, 'foobar');
+				},
+			],
+		},
+	});
+
+	t.is(temporaryRedirectBody, 'foobar');
 });
 
 test('clears username and password when redirecting to a different hostname', withServer, async (t, server, got) => {
@@ -537,7 +561,7 @@ test('clears the host header when redirecting to a different hostname', async t 
 });
 
 test('correct port on redirect', withServer, async (t, server1, got) => {
-	await withServer(t, async (t, server2) => {
+	await withServer.exec(t, async (t, server2) => {
 		server1.get('/redirect', (_request, response) => {
 			response.redirect(`http://${server2.hostname}:${server2.port}/`);
 		});

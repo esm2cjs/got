@@ -3,16 +3,12 @@
 /// <reference types="node" />
 /// <reference types="node" />
 /// <reference types="node" />
-/// <reference types="node" />
 import { Duplex } from 'node:stream';
 import { URL } from 'node:url';
-import { ServerResponse } from 'node:http';
 import type { ClientRequest } from 'node:http';
 import type { Socket } from 'node:net';
-import CacheableRequest from 'cacheable-request';
 import type { Timings } from '@esm2cjs/http-timer';
-import type ResponseLike from 'responselike';
-import Options, { type NativeRequestOptions } from './options.js';
+import Options from './options.js';
 import { type PlainResponse, type Response } from './response.js';
 import { RequestError } from './errors.js';
 declare type Error = NodeJS.ErrnoException;
@@ -87,7 +83,6 @@ export declare type RequestEvents<T> = {
     once: GotEventFunction<T>;
     off: GotEventFunction<T>;
 };
-export declare type CacheableRequestFunction = (options: string | URL | NativeRequestOptions, cb?: (response: ServerResponse | ResponseLike) => void) => CacheableRequest.Emitter;
 declare type UrlType = ConstructorParameters<typeof Options>[0];
 declare type OptionsType = ConstructorParameters<typeof Options>[1];
 declare type DefaultsType = ConstructorParameters<typeof Options>[2];

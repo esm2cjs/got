@@ -6,7 +6,12 @@ import http, {ServerResponse} from 'node:http';
 import type {ClientRequest, RequestOptions} from 'node:http';
 import type {Socket} from 'node:net';
 import timer from '@esm2cjs/http-timer';
-import CacheableRequest from 'cacheable-request';
+import CacheableRequest, {
+	CacheError as CacheableCacheError,
+	type StorageAdapter,
+	type CacheableRequestFunction,
+	type CacheableOptions,
+} from '@esm2cjs/cacheable-request';
 import decompressResponse from 'decompress-response';
 import is from '@esm2cjs/is';
 import {buffer as getBuffer} from 'get-stream';
@@ -124,12 +129,7 @@ export type RequestEvents<T> = {
 	off: GotEventFunction<T>;
 };
 
-export type CacheableRequestFunction = (
-	options: string | URL | NativeRequestOptions,
-	cb?: (response: ServerResponse | ResponseLike) => void
-) => CacheableRequest.Emitter;
-
-const cacheableStore = new WeakableMap<string | CacheableRequest.StorageAdapter, CacheableRequestFunction>();
+const cacheableStore = new WeakableMap<string | StorageAdapter, CacheableRequestFunction>();
 
 const redirectCodes: ReadonlySet<number> = new Set([300, 301, 302, 303, 304, 307, 308]);
 
@@ -483,7 +483,6 @@ export default class Request extends Duplex implements RequestEvents<Request> {
 					return;
 				}
 
-				// The `!destroyed` check is required to prevent `uploadProgress` being emitted after the stream was destroyed
 				if (!error) {
 					this._bodySize = this._uploadedSize;
 
@@ -732,10 +731,11 @@ export default class Request extends Duplex implements RequestEvents<Request> {
 
 			const updatedOptions = new Options(undefined, undefined, this.options);
 
-			const shouldBeGet = statusCode === 303 && updatedOptions.method !== 'GET' && updatedOptions.method !== 'HEAD';
-			if (shouldBeGet || updatedOptions.methodRewriting) {
-				// Server responded with "see other", indicating that the resource exists at another location,
-				// and the client should request it from that location via GET or HEAD.
+			const serverRequestedGet = statusCode === 303 && updatedOptions.method !== 'GET' && updatedOptions.method !== 'HEAD';
+			const canRewrite = statusCode !== 307 && statusCode !== 308;
+			const userRequestedGet = updatedOptions.methodRewriting && canRewrite;
+
+			if (serverRequestedGet || userRequestedGet) {
 				updatedOptions.method = 'GET';
 
 				updatedOptions.body = undefined;
@@ -969,9 +969,9 @@ export default class Request extends Duplex implements RequestEvents<Request> {
 		}
 	}
 
-	private _prepareCache(cache: string | CacheableRequest.StorageAdapter) {
+	private _prepareCache(cache: string | StorageAdapter) {
 		if (!cacheableStore.has(cache)) {
-			cacheableStore.set(cache, new CacheableRequest(
+			const cacheableRequest = new CacheableRequest(
 				((requestOptions: RequestOptions, handler?: (response: IncomingMessageWithTimings) => void): ClientRequest => {
 					const result = (requestOptions as any)._request(requestOptions, handler);
 
@@ -1010,8 +1010,9 @@ export default class Request extends Duplex implements RequestEvents<Request> {
 
 					return result;
 				}) as typeof http.request,
-				cache as CacheableRequest.StorageAdapter,
-			));
+				cache as StorageAdapter,
+			);
+			cacheableStore.set(cache, cacheableRequest.request());
 		}
 	}
 
@@ -1023,7 +1024,7 @@ export default class Request extends Duplex implements RequestEvents<Request> {
 			let request: ClientRequest | Promise<ClientRequest>;
 
 			// TODO: Fix `cacheable-response`. This is ugly.
-			const cacheRequest = cacheableStore.get((options as any).cache)!(options, async (response: any) => {
+			const cacheRequest = cacheableStore.get((options as any).cache)!(options as CacheableOptions, async (response: any) => {
 				response._readableState.autoDestroy = false;
 
 				if (request) {
@@ -1109,7 +1110,7 @@ export default class Request extends Duplex implements RequestEvents<Request> {
 		if (options.cache) {
 			(this._requestOptions as any)._request = request;
 			(this._requestOptions as any).cache = options.cache;
-			this._prepareCache(options.cache as CacheableRequest.StorageAdapter);
+			this._prepareCache(options.cache as StorageAdapter);
 		}
 
 		// Cache support
@@ -1145,7 +1146,7 @@ export default class Request extends Duplex implements RequestEvents<Request> {
 				void this._onResponse(requestOrResponse as IncomingMessageWithTimings);
 			}
 		} catch (error) {
-			if (error instanceof CacheableRequest.CacheError) {
+			if (error instanceof CacheableCacheError) {
 				throw new CacheError(error, this);
 			}
 

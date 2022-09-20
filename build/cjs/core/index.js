@@ -33,7 +33,7 @@ var import_node_stream = require("node:stream");
 var import_node_url = require("node:url");
 var import_node_http = __toESM(require("node:http"));
 var import_http_timer = __toESM(require("@esm2cjs/http-timer"));
-var import_cacheable_request = __toESM(require("cacheable-request"));
+var import_cacheable_request = __toESM(require("@esm2cjs/cacheable-request"));
 var import_decompress_response = __toESM(require("decompress-response"));
 var import_is = __toESM(require("@esm2cjs/is"));
 var import_get_stream = require("get-stream");
@@ -608,8 +608,10 @@ class Request extends import_node_stream.Duplex {
       }
       this._request = void 0;
       const updatedOptions = new import_options.default(void 0, void 0, this.options);
-      const shouldBeGet = statusCode === 303 && updatedOptions.method !== "GET" && updatedOptions.method !== "HEAD";
-      if (shouldBeGet || updatedOptions.methodRewriting) {
+      const serverRequestedGet = statusCode === 303 && updatedOptions.method !== "GET" && updatedOptions.method !== "HEAD";
+      const canRewrite = statusCode !== 307 && statusCode !== 308;
+      const userRequestedGet = updatedOptions.methodRewriting && canRewrite;
+      if (serverRequestedGet || userRequestedGet) {
         updatedOptions.method = "GET";
         updatedOptions.body = void 0;
         updatedOptions.json = void 0;
@@ -779,7 +781,7 @@ class Request extends import_node_stream.Duplex {
   }
   _prepareCache(cache) {
     if (!cacheableStore.has(cache)) {
-      cacheableStore.set(cache, new import_cacheable_request.default((requestOptions, handler) => {
+      const cacheableRequest = new import_cacheable_request.default((requestOptions, handler) => {
         const result = requestOptions._request(requestOptions, handler);
         if (import_is.default.promise(result)) {
           result.once = (event, handler2) => {
@@ -806,7 +808,8 @@ class Request extends import_node_stream.Duplex {
           };
         }
         return result;
-      }, cache));
+      }, cache);
+      cacheableStore.set(cache, cacheableRequest.request());
     }
   }
   async _createCacheableRequest(url, options) {
@@ -900,7 +903,7 @@ class Request extends import_node_stream.Duplex {
         void this._onResponse(requestOrResponse);
       }
     } catch (error) {
-      if (error instanceof import_cacheable_request.default.CacheError) {
+      if (error instanceof import_cacheable_request.CacheError) {
         throw new import_errors.CacheError(error, this);
       }
       throw error;

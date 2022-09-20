@@ -4,7 +4,7 @@ import { Duplex } from 'node:stream';
 import { URL, URLSearchParams } from 'node:url';
 import http, { ServerResponse } from 'node:http';
 import timer from '@esm2cjs/http-timer';
-import CacheableRequest from 'cacheable-request';
+import CacheableRequest, { CacheError as CacheableCacheError, } from '@esm2cjs/cacheable-request';
 import decompressResponse from 'decompress-response';
 import is from '@esm2cjs/is';
 import { buffer as getBuffer } from 'get-stream';
@@ -431,7 +431,6 @@ export default class Request extends Duplex {
                 if (this._request._writableState?.errored) {
                     return;
                 }
-                // The `!destroyed` check is required to prevent `uploadProgress` being emitted after the stream was destroyed
                 if (!error) {
                     this._bodySize = this._uploadedSize;
                     this.emit('uploadProgress', this.uploadProgress);
@@ -628,10 +627,10 @@ export default class Request extends Duplex {
             }
             this._request = undefined;
             const updatedOptions = new Options(undefined, undefined, this.options);
-            const shouldBeGet = statusCode === 303 && updatedOptions.method !== 'GET' && updatedOptions.method !== 'HEAD';
-            if (shouldBeGet || updatedOptions.methodRewriting) {
-                // Server responded with "see other", indicating that the resource exists at another location,
-                // and the client should request it from that location via GET or HEAD.
+            const serverRequestedGet = statusCode === 303 && updatedOptions.method !== 'GET' && updatedOptions.method !== 'HEAD';
+            const canRewrite = statusCode !== 307 && statusCode !== 308;
+            const userRequestedGet = updatedOptions.methodRewriting && canRewrite;
+            if (serverRequestedGet || userRequestedGet) {
                 updatedOptions.method = 'GET';
                 updatedOptions.body = undefined;
                 updatedOptions.json = undefined;
@@ -821,7 +820,7 @@ export default class Request extends Duplex {
     }
     _prepareCache(cache) {
         if (!cacheableStore.has(cache)) {
-            cacheableStore.set(cache, new CacheableRequest(((requestOptions, handler) => {
+            const cacheableRequest = new CacheableRequest(((requestOptions, handler) => {
                 const result = requestOptions._request(requestOptions, handler);
                 // TODO: remove this when `cacheable-request` supports async request functions.
                 if (is.promise(result)) {
@@ -859,7 +858,8 @@ export default class Request extends Duplex {
                     };
                 }
                 return result;
-            }), cache));
+            }), cache);
+            cacheableStore.set(cache, cacheableRequest.request());
         }
     }
     async _createCacheableRequest(url, options) {
@@ -968,7 +968,7 @@ export default class Request extends Duplex {
             }
         }
         catch (error) {
-            if (error instanceof CacheableRequest.CacheError) {
+            if (error instanceof CacheableCacheError) {
                 throw new CacheError(error, this);
             }
             throw error;

@@ -28,6 +28,7 @@ function replace_imports () {
 replace_imports "@sindresorhus/is" "@esm2cjs/is"
 replace_imports "@szmarczak/http-timer" "@esm2cjs/http-timer"
 replace_imports "cacheable-request"
+replace_imports "cacheable-lookup"
 replace_imports "form-data-encoder"
 replace_imports "lowercase-keys"
 replace_imports "p-cancelable"
@@ -66,6 +67,8 @@ PJSON=$(cat package.json | jq --tab '
 	| del(.dependencies["@szmarczak/http-timer"])
 	| .dependencies["@esm2cjs/cacheable-request"] = .dependencies["cacheable-request"]
 	| del(.dependencies["cacheable-request"])
+	| .dependencies["@esm2cjs/cacheable-lookup"] = .dependencies["cacheable-lookup"]
+	| del(.dependencies["cacheable-lookup"])
 	| .dependencies["@esm2cjs/form-data-encoder"] = .dependencies["form-data-encoder"]
 	| del(.dependencies["form-data-encoder"])
 	| .dependencies["@esm2cjs/lowercase-keys"] = .dependencies["lowercase-keys"]

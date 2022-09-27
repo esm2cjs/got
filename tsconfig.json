@@ -6,8 +6,6 @@
 		"lib": [
 			"es2020"
 		],
-		"module": "ES2020",
-		"moduleResolution": "node",
 		"noPropertyAccessFromIndexSignature": false,
 		"isolatedModules": true
 	},

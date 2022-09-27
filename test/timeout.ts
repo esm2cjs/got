@@ -7,7 +7,7 @@ import net from 'net';
 import getStream from 'get-stream';
 import test from 'ava';
 import delay from 'delay';
-import type CacheableLookup from 'cacheable-lookup';
+import type CacheableLookup from '@esm2cjs/cacheable-lookup';
 import type {Handler} from 'express';
 import {pEvent} from 'p-event';
 import got, {type RequestError, TimeoutError} from '../source/index.js';

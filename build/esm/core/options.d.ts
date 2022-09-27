@@ -1,12 +1,12 @@
-/// <reference types="node" />
-/// <reference types="node" />
-/// <reference types="node" />
-/// <reference types="node" />
-/// <reference types="node" />
-/// <reference types="node" />
-/// <reference types="node" />
-/// <reference types="node" />
-/// <reference types="node" />
+/// <reference types="node" resolution-mode="require"/>
+/// <reference types="node" resolution-mode="require"/>
+/// <reference types="node" resolution-mode="require"/>
+/// <reference types="node" resolution-mode="require"/>
+/// <reference types="node" resolution-mode="require"/>
+/// <reference types="node" resolution-mode="require"/>
+/// <reference types="node" resolution-mode="require"/>
+/// <reference types="node" resolution-mode="require"/>
+/// <reference types="node" resolution-mode="require"/>
 import type { Buffer } from 'node:buffer';
 import { URL, URLSearchParams } from 'node:url';
 import { checkServerIdentity } from 'node:tls';
@@ -17,7 +17,7 @@ import type { Socket } from 'node:net';
 import type { SecureContextOptions, DetailedPeerCertificate } from 'node:tls';
 import type { Agent as HttpAgent, ClientRequest } from 'node:http';
 import type { RequestOptions as HttpsRequestOptions, Agent as HttpsAgent } from 'node:https';
-import CacheableLookup from 'cacheable-lookup';
+import CacheableLookup from '@esm2cjs/cacheable-lookup';
 import http2wrapper, { type ClientHttp2Session } from 'http2-wrapper';
 import type { FormDataLike } from '@esm2cjs/form-data-encoder';
 import type { StorageAdapter } from '@esm2cjs/cacheable-request';
@@ -1151,12 +1151,12 @@ export default class Options {
         ignoreInvalidCookies: boolean;
         searchParams: string | SearchParameters | URLSearchParams | undefined;
         dnsLookup: {
-            (hostname: string, family: import("cacheable-lookup").IPFamily, callback: (error: NodeJS.ErrnoException | null, address: string, family: import("cacheable-lookup").IPFamily) => void): void;
-            (hostname: string, callback: (error: NodeJS.ErrnoException | null, address: string, family: import("cacheable-lookup").IPFamily) => void): void;
-            (hostname: string, options: import("cacheable-lookup").LookupOptions & {
+            (hostname: string, family: import("@esm2cjs/cacheable-lookup").IPFamily, callback: (error: NodeJS.ErrnoException | null, address: string, family: import("@esm2cjs/cacheable-lookup").IPFamily) => void): void;
+            (hostname: string, callback: (error: NodeJS.ErrnoException | null, address: string, family: import("@esm2cjs/cacheable-lookup").IPFamily) => void): void;
+            (hostname: string, options: import("@esm2cjs/cacheable-lookup").LookupOptions & {
                 all: true;
-            }, callback: (error: NodeJS.ErrnoException | null, result: readonly import("cacheable-lookup").EntryObject[]) => void): void;
-            (hostname: string, options: import("cacheable-lookup").LookupOptions, callback: (error: NodeJS.ErrnoException | null, address: string, family: import("cacheable-lookup").IPFamily) => void): void;
+            }, callback: (error: NodeJS.ErrnoException | null, result: readonly import("@esm2cjs/cacheable-lookup").EntryObject[]) => void): void;
+            (hostname: string, options: import("@esm2cjs/cacheable-lookup").LookupOptions, callback: (error: NodeJS.ErrnoException | null, address: string, family: import("@esm2cjs/cacheable-lookup").IPFamily) => void): void;
         } | undefined;
         dnsCache: boolean | CacheableLookup | undefined;
         context: Record<string, unknown>;
@@ -1204,12 +1204,12 @@ export default class Options {
         ecdhCurve: string | undefined;
         crl: string | Buffer | (string | Buffer)[] | undefined;
         lookup: {
-            (hostname: string, family: import("cacheable-lookup").IPFamily, callback: (error: NodeJS.ErrnoException | null, address: string, family: import("cacheable-lookup").IPFamily) => void): void;
-            (hostname: string, callback: (error: NodeJS.ErrnoException | null, address: string, family: import("cacheable-lookup").IPFamily) => void): void;
-            (hostname: string, options: import("cacheable-lookup").LookupOptions & {
+            (hostname: string, family: import("@esm2cjs/cacheable-lookup").IPFamily, callback: (error: NodeJS.ErrnoException | null, address: string, family: import("@esm2cjs/cacheable-lookup").IPFamily) => void): void;
+            (hostname: string, callback: (error: NodeJS.ErrnoException | null, address: string, family: import("@esm2cjs/cacheable-lookup").IPFamily) => void): void;
+            (hostname: string, options: import("@esm2cjs/cacheable-lookup").LookupOptions & {
                 all: true;
-            }, callback: (error: NodeJS.ErrnoException | null, result: readonly import("cacheable-lookup").EntryObject[]) => void): void;
-            (hostname: string, options: import("cacheable-lookup").LookupOptions, callback: (error: NodeJS.ErrnoException | null, address: string, family: import("cacheable-lookup").IPFamily) => void): void;
+            }, callback: (error: NodeJS.ErrnoException | null, result: readonly import("@esm2cjs/cacheable-lookup").EntryObject[]) => void): void;
+            (hostname: string, options: import("@esm2cjs/cacheable-lookup").LookupOptions, callback: (error: NodeJS.ErrnoException | null, address: string, family: import("@esm2cjs/cacheable-lookup").IPFamily) => void): void;
         } | undefined;
         family: DnsLookupIpVersion;
         agent: false | Agents | http.Agent | undefined;

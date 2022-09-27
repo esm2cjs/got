@@ -1,4 +1,4 @@
-/// <reference types="node" />
+/// <reference types="node" resolution-mode="require"/>
 import { URL } from 'node:url';
 export declare type URLOptions = {
     href?: string;

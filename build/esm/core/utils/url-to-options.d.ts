@@ -1,4 +1,4 @@
-/// <reference types="node" />
+/// <reference types="node" resolution-mode="require"/>
 import type { URL, UrlWithStringQuery } from 'node:url';
 export declare type LegacyUrlOptions = {
     protocol: string;

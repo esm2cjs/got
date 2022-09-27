@@ -1,4 +1,4 @@
-/// <reference types="node" />
+/// <reference types="node" resolution-mode="require"/>
 import type { Readable } from 'node:stream';
 declare type FormData = {
     getBoundary: () => string;

@@ -1,4 +1,4 @@
-/// <reference types="node" />
+/// <reference types="node" resolution-mode="require"/>
 import type { EventEmitter } from 'node:events';
 declare type Origin = EventEmitter;
 declare type Event = string | symbol;

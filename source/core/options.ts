@@ -20,7 +20,7 @@ import type {
 import type {InspectOptions} from 'node:util';
 import is, {assert} from '@esm2cjs/is';
 import lowercaseKeys from '@esm2cjs/lowercase-keys';
-import CacheableLookup from 'cacheable-lookup';
+import CacheableLookup from '@esm2cjs/cacheable-lookup';
 import http2wrapper, {type ClientHttp2Session} from 'http2-wrapper';
 import {isFormData} from '@esm2cjs/form-data-encoder';
 import type {FormDataLike} from '@esm2cjs/form-data-encoder';

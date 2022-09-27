@@ -878,6 +878,7 @@ class Request extends import_node_stream.Duplex {
     if (options.cache) {
       this._requestOptions._request = request;
       this._requestOptions.cache = options.cache;
+      this._requestOptions.body = options.body;
       this._prepareCache(options.cache);
     }
     const fn = options.cache ? this._createCacheableRequest : request;

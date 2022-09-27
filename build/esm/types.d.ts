@@ -1,5 +1,5 @@
-/// <reference types="node" />
-/// <reference types="node" />
+/// <reference types="node" resolution-mode="require"/>
+/// <reference types="node" resolution-mode="require"/>
 import type { Buffer } from 'node:buffer';
 import type { URL } from 'node:url';
 import type { CancelableRequest } from './as-promise/types.js';

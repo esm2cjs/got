@@ -7,7 +7,7 @@ import http from 'node:http';
 import https from 'node:https';
 import is, { assert } from '@esm2cjs/is';
 import lowercaseKeys from '@esm2cjs/lowercase-keys';
-import CacheableLookup from 'cacheable-lookup';
+import CacheableLookup from '@esm2cjs/cacheable-lookup';
 import http2wrapper from 'http2-wrapper';
 import { isFormData } from '@esm2cjs/form-data-encoder';
 import parseLinkHeader from './parse-link-header.js';

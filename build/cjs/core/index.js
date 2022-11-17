@@ -65,7 +65,6 @@ const noop = () => {
 };
 class Request extends import_node_stream.Duplex {
   constructor(url, options, defaults) {
-    var _a, _b;
     super({
       autoDestroy: false,
       highWaterMark: 0
@@ -190,6 +189,12 @@ class Request extends import_node_stream.Duplex {
       writable: true,
       value: void 0
     });
+    Object.defineProperty(this, "_removeListeners", {
+      enumerable: true,
+      configurable: true,
+      writable: true,
+      value: void 0
+    });
     Object.defineProperty(this, "_nativeResponse", {
       enumerable: true,
       configurable: true,
@@ -222,6 +227,7 @@ class Request extends import_node_stream.Duplex {
     this._unproxyEvents = noop;
     this._triggerRead = false;
     this._cancelTimeouts = noop;
+    this._removeListeners = noop;
     this._jobs = [];
     this._flushed = false;
     this._requestInitialized = false;
@@ -260,12 +266,6 @@ class Request extends import_node_stream.Duplex {
       };
       return;
     }
-    if ((_a = this.options.signal) == null ? void 0 : _a.aborted) {
-      this.destroy(new import_errors.AbortError(this));
-    }
-    (_b = this.options.signal) == null ? void 0 : _b.addEventListener("abort", () => {
-      this.destroy(new import_errors.AbortError(this));
-    });
     const { body } = this.options;
     if (import_is.default.nodeStream(body)) {
       body.once("error", (error) => {
@@ -279,6 +279,19 @@ class Request extends import_node_stream.Duplex {
           };
         }
       });
+    }
+    if (this.options.signal) {
+      const abort = () => {
+        this.destroy(new import_errors.AbortError(this));
+      };
+      if (this.options.signal.aborted) {
+        abort();
+      } else {
+        this.options.signal.addEventListener("abort", abort);
+        this._removeListeners = () => {
+          this.options.signal.removeEventListener("abort", abort);
+        };
+      }
     }
   }
   async flush() {
@@ -455,6 +468,7 @@ class Request extends import_node_stream.Duplex {
     };
     this._stopRetry();
     this._cancelTimeouts();
+    this._removeListeners();
     if (this.options) {
       const { body } = this.options;
       if (import_is.default.nodeStream(body)) {

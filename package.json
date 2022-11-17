@@ -1,6 +1,6 @@
 {
 	"name": "@esm2cjs/got",
-	"version": "12.5.2",
+	"version": "12.5.3",
 	"description": "Human-friendly and powerful HTTP request library for Node.js. This is a fork of sindresorhus/got, but with CommonJS support.",
 	"license": "MIT",
 	"repository": "esm2cjs/got",

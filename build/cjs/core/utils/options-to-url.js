@@ -21,7 +21,6 @@ __export(options_to_url_exports, {
   default: () => optionsToUrl
 });
 module.exports = __toCommonJS(options_to_url_exports);
-var import_node_url = require("node:url");
 const keys = [
   "protocol",
   "host",
@@ -52,7 +51,7 @@ function optionsToUrl(origin, options) {
     }
     origin = `${options.protocol}//${(_b = (_a = options.hostname) != null ? _a : options.host) != null ? _b : ""}`;
   }
-  const url = new import_node_url.URL(origin);
+  const url = new URL(origin);
   if (options.path) {
     const searchIndex = options.path.indexOf("?");
     if (searchIndex === -1) {

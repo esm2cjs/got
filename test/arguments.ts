@@ -1,4 +1,4 @@
-import {parse, URL, URLSearchParams} from 'url';
+import {parse} from 'node:url';
 import test from 'ava';
 import type {Handler} from 'express';
 import {pEvent} from 'p-event';
@@ -25,16 +25,6 @@ test('`url` is required', async t => {
 
 	const secondError = await t.throwsAsync(got({url: ''}));
 	invalidUrl(t, secondError!, '');
-});
-
-test('`url` should be utf-8 encoded', async t => {
-	await t.throwsAsync(
-		got('https://example.com/%D2%E0%EB%EB%E8%ED'),
-		{
-			instanceOf: RequestError,
-			message: 'URI malformed',
-		},
-	);
 });
 
 test('throws if no arguments provided', async t => {

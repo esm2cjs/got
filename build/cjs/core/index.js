@@ -30,13 +30,12 @@ module.exports = __toCommonJS(core_exports);
 var import_node_process = __toESM(require("node:process"));
 var import_node_buffer = require("node:buffer");
 var import_node_stream = require("node:stream");
-var import_node_url = require("node:url");
 var import_node_http = __toESM(require("node:http"));
 var import_http_timer = __toESM(require("@esm2cjs/http-timer"));
 var import_cacheable_request = __toESM(require("@esm2cjs/cacheable-request"));
 var import_decompress_response = __toESM(require("decompress-response"));
 var import_is = __toESM(require("@esm2cjs/is"));
-var import_get_stream = require("get-stream");
+var import_get_stream = __toESM(require("get-stream"));
 var import_form_data_encoder = require("@esm2cjs/form-data-encoder");
 var import_get_body_size = __toESM(require("./utils/get-body-size.js"));
 var import_is_form_data = __toESM(require("./utils/is-form-data.js"));
@@ -50,6 +49,7 @@ var import_response = require("./response.js");
 var import_is_client_request = __toESM(require("./utils/is-client-request.js"));
 var import_is_unix_socket_url = __toESM(require("./utils/is-unix-socket-url.js"));
 var import_errors = require("./errors.js");
+const { buffer: getStreamAsBuffer } = import_get_stream.default;
 const supportsBrotli = import_is.default.string(import_node_process.default.versions.brotli);
 const methodsWithoutBody = /* @__PURE__ */ new Set(["GET", "HEAD"]);
 const cacheableStore = new import_weakable_map.default();
@@ -236,7 +236,7 @@ class Request extends import_node_stream.Duplex {
     this.retryCount = 0;
     this._stopRetry = noop;
     this.on("pipe", (source) => {
-      if (source.headers) {
+      if (source == null ? void 0 : source.headers) {
         Object.assign(this.options.headers, source.headers);
       }
     });
@@ -289,7 +289,8 @@ class Request extends import_node_stream.Duplex {
       } else {
         this.options.signal.addEventListener("abort", abort);
         this._removeListeners = () => {
-          this.options.signal.removeEventListener("abort", abort);
+          var _a;
+          (_a = this.options.signal) == null ? void 0 : _a.removeEventListener("abort", abort);
         };
       }
     }
@@ -529,7 +530,7 @@ class Request extends import_node_stream.Duplex {
         }
         const { form } = options;
         options.form = void 0;
-        options.body = new import_node_url.URLSearchParams(form).toString();
+        options.body = new URLSearchParams(form).toString();
       } else {
         if (noContentType) {
           headers["content-type"] = "application/json";
@@ -549,7 +550,7 @@ class Request extends import_node_stream.Duplex {
     this._bodySize = Number(headers["content-length"]) || void 0;
   }
   async _onResponseBase(response) {
-    var _a;
+    var _a, _b;
     if (this.isAborted) {
       return;
     }
@@ -561,12 +562,12 @@ class Request extends import_node_stream.Duplex {
     }
     const statusCode = response.statusCode;
     const typedResponse = response;
-    typedResponse.statusMessage = typedResponse.statusMessage ? typedResponse.statusMessage : import_node_http.default.STATUS_CODES[statusCode];
+    typedResponse.statusMessage = (_a = typedResponse.statusMessage) != null ? _a : import_node_http.default.STATUS_CODES[statusCode];
     typedResponse.url = options.url.toString();
     typedResponse.requestUrl = this.requestUrl;
     typedResponse.redirectUrls = this.redirectUrls;
     typedResponse.request = this;
-    typedResponse.isFromCache = (_a = this._nativeResponse.fromCache) != null ? _a : false;
+    typedResponse.isFromCache = (_b = this._nativeResponse.fromCache) != null ? _b : false;
     typedResponse.ip = this.ip;
     typedResponse.retryCount = this.retryCount;
     typedResponse.ok = (0, import_response.isResponseOk)(typedResponse);
@@ -634,7 +635,7 @@ class Request extends import_node_stream.Duplex {
       }
       try {
         const redirectBuffer = import_node_buffer.Buffer.from(response.headers.location, "binary").toString();
-        const redirectUrl = new import_node_url.URL(redirectBuffer, url);
+        const redirectUrl = new URL(redirectBuffer, url);
         if (!(0, import_is_unix_socket_url.default)(url) && (0, import_is_unix_socket_url.default)(redirectUrl)) {
           this._beforeError(new import_errors.RequestError("Cannot redirect to UNIX socket", {}, this));
           return;
@@ -717,7 +718,7 @@ class Request extends import_node_stream.Duplex {
       return false;
     }
     try {
-      const rawBody = await (0, import_get_stream.buffer)(from);
+      const rawBody = await getStreamAsBuffer(from);
       if (!this.isAborted) {
         this.response.rawBody = rawBody;
         return true;

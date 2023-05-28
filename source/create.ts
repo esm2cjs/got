@@ -1,4 +1,3 @@
-import type {URL} from 'node:url';
 import is, {assert} from '@esm2cjs/is';
 import asPromise from './as-promise/index.js';
 import type {

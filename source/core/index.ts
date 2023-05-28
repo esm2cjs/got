@@ -1,7 +1,6 @@
 import process from 'node:process';
 import {Buffer} from 'node:buffer';
 import {Duplex, type Readable} from 'node:stream';
-import {URL, URLSearchParams} from 'node:url';
 import http, {ServerResponse} from 'node:http';
 import type {ClientRequest, RequestOptions} from 'node:http';
 import type {Socket} from 'node:net';
@@ -14,7 +13,7 @@ import CacheableRequest, {
 } from '@esm2cjs/cacheable-request';
 import decompressResponse from 'decompress-response';
 import is from '@esm2cjs/is';
-import {buffer as getBuffer} from 'get-stream';
+import getStream from 'get-stream';
 import {FormDataEncoder, isFormData as isFormDataLike} from '@esm2cjs/form-data-encoder';
 import type {ClientRequestWithTimings, Timings, IncomingMessageWithTimings} from '@esm2cjs/http-timer';
 import type ResponseLike from 'responselike';
@@ -45,6 +44,8 @@ import {
 	CacheError,
 	AbortError,
 } from './errors.js';
+
+const {buffer: getStreamAsBuffer} = getStream;
 
 type Error = NodeJS.ErrnoException;
 
@@ -174,7 +175,7 @@ export default class Request extends Duplex implements RequestEvents<Request> {
 	private _isFromCache?: boolean;
 	private _cannotHaveBody: boolean;
 	private _triggerRead: boolean;
-	declare private _jobs: Array<() => void>;
+	declare private readonly _jobs: Array<() => void>;
 	private _cancelTimeouts: () => void;
 	private readonly _removeListeners: () => void;
 	private _nativeResponse?: IncomingMessageWithTimings;
@@ -211,8 +212,8 @@ export default class Request extends Duplex implements RequestEvents<Request> {
 
 		this._stopRetry = noop;
 
-		this.on('pipe', source => {
-			if (source.headers) {
+		this.on('pipe', (source: any) => {
+			if (source?.headers) {
 				Object.assign(this.options.headers, source.headers);
 			}
 		});
@@ -275,8 +276,9 @@ export default class Request extends Duplex implements RequestEvents<Request> {
 				abort();
 			} else {
 				this.options.signal.addEventListener('abort', abort);
+
 				this._removeListeners = () => {
-					this.options.signal.removeEventListener('abort', abort);
+					this.options.signal?.removeEventListener('abort', abort);
 				};
 			}
 		}
@@ -656,7 +658,7 @@ export default class Request extends Duplex implements RequestEvents<Request> {
 		const statusCode = response.statusCode!;
 		const typedResponse = response as PlainResponse;
 
-		typedResponse.statusMessage = typedResponse.statusMessage ? typedResponse.statusMessage : http.STATUS_CODES[statusCode];
+		typedResponse.statusMessage = typedResponse.statusMessage ?? http.STATUS_CODES[statusCode];
 		typedResponse.url = options.url!.toString();
 		typedResponse.requestUrl = this.requestUrl!;
 		typedResponse.redirectUrls = this.redirectUrls;
@@ -875,7 +877,11 @@ export default class Request extends Duplex implements RequestEvents<Request> {
 
 		try {
 			// Errors are emitted via the `error` event
-			const rawBody = await getBuffer(from);
+			const rawBody = await getStreamAsBuffer(from);
+
+			// TODO: Switch to this:
+			// let rawBody = await from.toArray();
+			// rawBody = Buffer.concat(rawBody);
 
 			// On retry Request is destroyed with no error, therefore the above will successfully resolve.
 			// So in order to check if this was really successfull, we need to check if it has been properly ended.
@@ -990,7 +996,6 @@ export default class Request extends Duplex implements RequestEvents<Request> {
 						// We only need to implement the error handler in order to support HTTP2 caching.
 						// The result will be a promise anyway.
 						// @ts-expect-error ignore
-						// eslint-disable-next-line @typescript-eslint/promise-function-async
 						result.once = (event: string, handler: (reason: unknown) => void) => {
 							if (event === 'error') {
 								(async () => {

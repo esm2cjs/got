@@ -1,7 +1,6 @@
 import process from 'node:process';
 import type {Buffer} from 'node:buffer';
 import {promisify, inspect} from 'node:util';
-import {URL, URLSearchParams} from 'node:url';
 import {checkServerIdentity} from 'node:tls';
 // DO NOT use destructuring for `https.request` and `http.request` as it's not compatible with `nock`.
 import http from 'node:http';
@@ -828,7 +827,7 @@ const defaultInternals: Options['_internals'] = {
 	setHost: true,
 	maxHeaderSize: undefined,
 	signal: undefined,
-	enableUnixSockets: true,
+	enableUnixSockets: false,
 };
 
 const cloneInternals = (internals: typeof defaultInternals) => {
@@ -976,7 +975,7 @@ const init = (options: OptionsInit, withOptions: OptionsInit, self: Options): vo
 
 export default class Options {
 	private _unixOptions?: NativeRequestOptions;
-	private _internals: InternalsType;
+	private readonly _internals: InternalsType;
 	private _merging: boolean;
 	private readonly _init: OptionsInit[];
 
@@ -1078,7 +1077,13 @@ export default class Options {
 				}
 
 				// @ts-expect-error Type 'unknown' is not assignable to type 'never'.
-				this[key as keyof Options] = options[key as keyof Options];
+				const value = options[key as keyof Options];
+				if (value === undefined) {
+					continue;
+				}
+
+				// @ts-expect-error Type 'unknown' is not assignable to type 'never'.
+				this[key as keyof Options] = value;
 
 				push = true;
 			}
@@ -1403,7 +1408,6 @@ export default class Options {
 		const urlString = `${this.prefixUrl as string}${value.toString()}`;
 		const url = new URL(urlString);
 		this._internals.url = url;
-		decodeURI(urlString);
 
 		if (url.protocol === 'unix:') {
 			url.href = `http://unix${url.pathname}${url.search}`;
@@ -1495,8 +1499,6 @@ export default class Options {
 	/**
 	You can abort the `request` using [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController).
 
-	*Requires Node.js 16 or later.*
-
 	@example
 	```
 	import got from 'got';
@@ -1512,13 +1514,11 @@ export default class Options {
 	}, 100);
 	```
 	*/
-	// TODO: Replace `any` with `AbortSignal` when targeting Node 16.
-	get signal(): any | undefined {
+	get signal(): AbortSignal | undefined {
 		return this._internals.signal;
 	}
 
-	// TODO: Replace `any` with `AbortSignal` when targeting Node 16.
-	set signal(value: any | undefined) {
+	set signal(value: AbortSignal | undefined) {
 		assert.object(value);
 
 		this._internals.signal = value;

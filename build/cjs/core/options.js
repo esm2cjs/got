@@ -29,7 +29,6 @@ __export(options_exports, {
 module.exports = __toCommonJS(options_exports);
 var import_node_process = __toESM(require("node:process"));
 var import_node_util = require("node:util");
-var import_node_url = require("node:url");
 var import_node_tls = require("node:tls");
 var import_node_http = __toESM(require("node:http"));
 var import_node_https = __toESM(require("node:https"));
@@ -193,7 +192,7 @@ const defaultInternals = {
       const next = parsed.find((entry) => entry.parameters.rel === "next" || entry.parameters.rel === '"next"');
       if (next) {
         return {
-          url: new import_node_url.URL(next.reference, response.url)
+          url: new URL(next.reference, response.url)
         };
       }
       return false;
@@ -208,7 +207,7 @@ const defaultInternals = {
   setHost: true,
   maxHeaderSize: void 0,
   signal: void 0,
-  enableUnixSockets: true
+  enableUnixSockets: false
 };
 const cloneInternals = (internals) => {
   const { hooks, retry } = internals;
@@ -234,7 +233,7 @@ const cloneInternals = (internals) => {
       beforeRetry: [...hooks.beforeRetry],
       afterResponse: [...hooks.afterResponse]
     },
-    searchParams: internals.searchParams ? new import_node_url.URLSearchParams(internals.searchParams) : void 0,
+    searchParams: internals.searchParams ? new URLSearchParams(internals.searchParams) : void 0,
     pagination: { ...internals.pagination }
   };
   if (result.url !== void 0) {
@@ -416,7 +415,11 @@ class Options {
         if (!(key in this)) {
           throw new Error(`Unexpected option: ${key}`);
         }
-        this[key] = options[key];
+        const value = options[key];
+        if (value === void 0) {
+          continue;
+        }
+        this[key] = value;
         push = true;
       }
       if (push) {
@@ -547,9 +550,8 @@ class Options {
       throw new Error("`url` must not start with a slash");
     }
     const urlString = `${this.prefixUrl}${value.toString()}`;
-    const url = new import_node_url.URL(urlString);
+    const url = new URL(urlString);
     this._internals.url = url;
-    decodeURI(urlString);
     if (url.protocol === "unix:") {
       url.href = `http://unix${url.pathname}${url.search}`;
     }
@@ -631,7 +633,7 @@ class Options {
       return this._internals.url.searchParams;
     }
     if (this._internals.searchParams === void 0) {
-      this._internals.searchParams = new import_node_url.URLSearchParams();
+      this._internals.searchParams = new URLSearchParams();
     }
     return this._internals.searchParams;
   }
@@ -648,12 +650,12 @@ class Options {
     const searchParameters = this.searchParams;
     let updated;
     if (import_is.default.string(value)) {
-      updated = new import_node_url.URLSearchParams(value);
-    } else if (value instanceof import_node_url.URLSearchParams) {
+      updated = new URLSearchParams(value);
+    } else if (value instanceof URLSearchParams) {
       updated = value;
     } else {
       validateSearchParameters(value);
-      updated = new import_node_url.URLSearchParams();
+      updated = new URLSearchParams();
       for (const key in value) {
         const entry = value[key];
         if (entry === null) {

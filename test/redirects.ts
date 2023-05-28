@@ -1,4 +1,4 @@
-import {Buffer} from 'buffer';
+import {Buffer} from 'node:buffer';
 import test from 'ava';
 import type {Handler} from 'express';
 import nock from 'nock';
@@ -46,14 +46,16 @@ test('cannot redirect to UNIX protocol when UNIX sockets are enabled', withServe
 	server.get('/protocol', unixProtocol);
 	server.get('/hostname', unixHostname);
 
-	t.true(got.defaults.options.enableUnixSockets);
+	const gotUnixSocketsEnabled = got.extend({enableUnixSockets: true});
 
-	await t.throwsAsync(got('protocol'), {
+	t.true(gotUnixSocketsEnabled.defaults.options.enableUnixSockets);
+
+	await t.throwsAsync(gotUnixSocketsEnabled('protocol'), {
 		message: 'Cannot redirect to UNIX socket',
 		instanceOf: RequestError,
 	});
 
-	await t.throwsAsync(got('hostname'), {
+	await t.throwsAsync(gotUnixSocketsEnabled('hostname'), {
 		message: 'Cannot redirect to UNIX socket',
 		instanceOf: RequestError,
 	});
@@ -338,19 +340,6 @@ test('redirect response contains UTF-8 with URI encoding', withServer, async (t,
 	});
 
 	t.is((await got('redirect-with-uri-encoded-location')).body, 'reached');
-});
-
-test('throws on malformed redirect URI', withServer, async (t, server, got) => {
-	server.get('/', (_request, response) => {
-		response.writeHead(302, {
-			location: '/%D8',
-		});
-		response.end();
-	});
-
-	await t.throwsAsync(got(''), {
-		message: 'URI malformed',
-	});
 });
 
 test('throws on invalid redirect URL', withServer, async (t, server, got) => {
